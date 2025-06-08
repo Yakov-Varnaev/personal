@@ -1,26 +1,17 @@
 <template>
-  <section ref="container" class="about-me-horizontal">
-    <div class="pinned">
-      <div class="slides" :style="slideStyle">
-        <div
-          v-for="(event, index) in events"
-          :key="index"
-          class="slide"
-          :style="{ background: event.background }"
-        >
-          <div class="slide-content">
-            <v-icon
-              size="80"
-              class="slide-icon"
-              :style="{ transform: `translateY(${scrollY * 0.1}px)` }"
-            >
-              {{ event.icon }}
-            </v-icon>
-            <h2 class="slide-year">{{ event.year }}</h2>
-            <h1 class="slide-title">{{ event.title }}</h1>
-            <p class="slide-description">{{ event.description }}</p>
-          </div>
-        </div>
+  <section ref="container" class="about-me-stack">
+    <div class="stack-wrapper">
+      <div
+        v-for="(event, index) in events"
+        :key="index"
+        class="stack-card"
+        :class="{ active: index === activeIndex }"
+        :style="cardStyle(index)"
+      >
+        <v-icon size="80" class="stack-icon">{{ event.icon }}</v-icon>
+        <h2 class="stack-year">{{ event.year }}</h2>
+        <h1 class="stack-title">{{ event.title }}</h1>
+        <p class="stack-description">{{ event.description }}</p>
       </div>
     </div>
   </section>
@@ -31,7 +22,6 @@ import { ref, onMounted, onUnmounted, computed } from "vue";
 
 const container = ref(null);
 const scrollY = ref(0);
-const totalSlides = 6;
 
 const events = [
   {
@@ -39,147 +29,151 @@ const events = [
     title: "Python",
     description: "Начал писать на Python.",
     icon: "mdi-language-python",
-    background: "linear-gradient(to right, #fceabb, #f8b500)",
   },
   {
     year: "2020",
     title: "Backend",
     description: "Первая работа с FastAPI.",
     icon: "mdi-server",
-    background: "linear-gradient(to right, #d3cce3, #e9e4f0)",
   },
   {
     year: "2021",
     title: "Go",
     description: "Перешел на Go и микросервисы.",
     icon: "mdi-cloud-outline",
-    background: "linear-gradient(to right, #00c6ff, #0072ff)",
   },
   {
     year: "2022",
     title: "CI/CD",
     description: "Настроил пайплайны.",
     icon: "mdi-cogs",
-    background: "linear-gradient(to right, #f7971e, #ffd200)",
   },
   {
     year: "2023",
     title: "Лидерство",
     description: "Лидил команду.",
     icon: "mdi-account-group",
-    background: "linear-gradient(to right, #9be15d, #00e3ae)",
   },
   {
     year: "2024",
     title: "Техлид",
     description: "Техлид в Яндексе.",
     icon: "mdi-star-circle",
-    background: "linear-gradient(to right, #fc466b, #3f5efb)",
   },
 ];
 
-const handleScroll = () => {
-  if (!container.value) return;
-  const rect = container.value.getBoundingClientRect();
-  const offset = Math.max(-rect.top, 0);
-  scrollY.value = offset;
+const total = events.length;
+
+const activeIndex = computed(() => {
+  if (!container.value) return 0;
+
+  const sectionTop = container.value.offsetTop;
+  const relativeScroll = scrollY.value - sectionTop;
+  const viewportHeight = window.innerHeight;
+
+  if (relativeScroll <= 0) return 0;
+  if (relativeScroll >= viewportHeight * (total - 1)) return total - 1;
+
+  return Math.floor(relativeScroll / viewportHeight);
+});
+
+const onScroll = () => {
+  scrollY.value = window.scrollY;
 };
 
 onMounted(() => {
-  window.addEventListener("scroll", handleScroll);
-});
-onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
+  window.addEventListener("scroll", onScroll);
+  onScroll(); // для инициализации сразу
 });
 
-const slideStyle = computed(() => {
-  const percentage = scrollY.value / (window.innerHeight * totalSlides);
-  return {
-    transform: `translateX(-${percentage * 100}%)`,
-  };
+onUnmounted(() => {
+  window.removeEventListener("scroll", onScroll);
 });
+const cardStyle = (index) => {
+  const offset = index - activeIndex.value;
+
+  if (offset < 0) {
+    // Карточки, которые уже были "пролистаны" — уезжают вниз и прозрачны
+    return {
+      transform: `translateY(40px) scale(0.9)`,
+      opacity: 0,
+      pointerEvents: "none",
+      zIndex: 10,
+      transition: "all 0.5s ease",
+    };
+  } else if (offset === 0) {
+    // Активная карточка — на виду, крупнее
+    return {
+      transform: `translateY(0px) scale(1)`,
+      opacity: 1,
+      zIndex: 30,
+      transition: "all 0.5s ease",
+    };
+  } else {
+    // Карточки, которые впереди — сдвинуты вниз, чуть меньше, и ниже по слою
+    const translateY = offset * 20;
+    const scale = 1 - offset * 0.05;
+    const opacity = 1 - offset * 0.3;
+    return {
+      transform: `translateY(${translateY}px) scale(${scale})`,
+      opacity: opacity,
+      zIndex: 20 - offset,
+      transition: "all 0.5s ease",
+      pointerEvents: "none",
+    };
+  }
+};
 </script>
 
 <style scoped>
-.about-me-horizontal {
+.about-me-stack {
   height: calc(100vh * 6);
   position: relative;
+  background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
 }
 
-.pinned {
+.stack-wrapper {
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-}
-
-.slides {
-  display: flex;
-  flex-direction: row;
-  transition: transform 0.2s ease-out;
-  will-change: transform;
-  height: 100%;
-}
-
-.slide {
-  width: 100vw;
-  flex-shrink: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-size: cover;
-  background-position: center;
-  position: relative;
 }
 
-.slide-content {
-  text-align: center;
-  padding: 40px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 24px;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
-  max-width: 700px;
+.stack-card {
+  position: absolute;
   width: 80%;
-  animation: fadeIn 1s ease;
-  transition: background 0.5s;
-}
-
-.slide-icon {
+  max-width: 800px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
   color: white;
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
-  margin-bottom: 24px;
+  user-select: none;
+}
+.stack-icon {
+  margin-bottom: 20px;
+  color: white;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
 }
 
-.slide-year {
-  font-size: 1.8rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 12px;
+.stack-year {
+  font-size: 1.4rem;
+  opacity: 0.8;
+  margin-bottom: 8px;
 }
 
-.slide-title {
-  font-size: 3rem;
+.stack-title {
+  font-size: 2.5rem;
   font-weight: 700;
-  color: white;
   margin-bottom: 16px;
 }
 
-.slide-description {
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.9);
+.stack-description {
+  font-size: 1.2rem;
   line-height: 1.6;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  opacity: 0.95;
 }
 </style>
