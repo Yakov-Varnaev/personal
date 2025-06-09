@@ -1,5 +1,5 @@
 <template>
-  <section ref="container" class="about-me-stack">
+  <section ref="container" class="about-me-stack" id="about">
     <div class="stack-wrapper">
       <div
         v-for="(event, index) in events"
@@ -126,10 +126,16 @@ const cardStyle = (index) => {
 </script>
 
 <style scoped>
+/* .about-section { */
+/*   padding: 96px 0; */
+/*   color: white; */
+/*   transition: background 0.6s ease; */
+/* } */
+
 .about-me-stack {
   height: calc(100vh * 6);
   position: relative;
-  background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+  background: linear-gradient(to bottom, #2c5364 0%, #39597a 100%);
 }
 
 .stack-wrapper {
@@ -139,6 +145,7 @@ const cardStyle = (index) => {
   display: flex;
   justify-content: center;
   align-items: center;
+  color: white;
 }
 
 .stack-card {
@@ -150,12 +157,10 @@ const cardStyle = (index) => {
   border-radius: 24px;
   padding: 40px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-  color: white;
   user-select: none;
 }
 .stack-icon {
   margin-bottom: 20px;
-  color: white;
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
 }
 

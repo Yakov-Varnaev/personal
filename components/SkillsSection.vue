@@ -1,25 +1,31 @@
 <template>
-  <div class="auto-slider" @mouseenter="pauseScroll" @mouseleave="resumeScroll">
-    <div class="slider-track" ref="track">
-      <div
-        class="slide"
-        v-for="(skill, index) in duplicatedSkills"
-        :key="index"
-      >
-        <v-card
-          class="skill-card d-flex flex-column align-center justify-center"
-          elevation="6"
-          width="180"
-          height="140"
+  <section class="skills-section" id="skills">
+    <div
+      class="auto-slider"
+      @mouseenter="pauseScroll"
+      @mouseleave="resumeScroll"
+    >
+      <div class="slider-track" ref="track">
+        <div
+          class="slide"
+          v-for="(skill, index) in duplicatedSkills"
+          :key="index"
         >
-          <v-icon size="40" class="mb-2">{{ skill.icon }}</v-icon>
-          <div class="text-subtitle-2 font-weight-medium">
-            {{ skill.name }}
-          </div>
-        </v-card>
+          <v-card
+            class="skill-card d-flex flex-column align-center justify-center"
+            elevation="6"
+            width="180"
+            height="140"
+          >
+            <v-icon size="40" class="mb-2">{{ skill.icon }}</v-icon>
+            <div class="text-subtitle-2 font-weight-medium">
+              {{ skill.name }}
+            </div>
+          </v-card>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -116,24 +122,53 @@ onUnmounted(() => cancelAnimationFrame(animationFrame));
 
 .skill-card {
   background: linear-gradient(
-    to bottom right,
+    135deg,
     rgba(255, 255, 255, 0.85),
     rgba(240, 240, 240, 0.7)
   );
-  backdrop-filter: blur(6px);
-  transition: transform 0.3s ease;
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  color: #333;
 }
+
 .skill-card:hover {
   transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
 }
 
 /* Dark theme */
 :deep(.v-theme--dark) .skill-card {
   background: linear-gradient(
-    to bottom right,
+    135deg,
     rgba(30, 30, 30, 0.9),
     rgba(50, 50, 50, 0.65)
   );
+  color: #eee;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+:deep(.v-theme--dark) .skill-card:hover {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+}
+
+.skills-section {
+  padding: 64px 0;
+  background: linear-gradient(to bottom, #203a43 0%, #2c5364 100%);
+  transition: background 0.6s ease;
   color: white;
+}
+
+:deep(.v-theme--light) .skills-section {
+  background: linear-gradient(to bottom, #c3cfe2, #f5f7fa);
+  color: #222;
+}
+
+.auto-slider {
+  overflow: hidden;
+  width: 100%;
+  padding: 32px 0;
 }
 </style>
