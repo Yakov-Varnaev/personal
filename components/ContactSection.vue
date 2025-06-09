@@ -26,13 +26,12 @@
         <button type="submit">Отправить</button>
       </form>
       <div class="contacts-info">
-        <p>
-          Email:
-          <a href="mailto:your.email@example.com">your.email@example.com</a>
+        <p class="telegram">
+          <a href="mailto:yakovvarnaev@yandex.ru">yakovvarnaev@yandex.ru</a>
         </p>
         <p class="telegram">
           <a
-            href="https://t.me/yourtelegram"
+            href="https://t.me/YakovVarnaev"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -41,7 +40,7 @@
               alt="Telegram Icon"
               class="telegram-icon"
             />
-            @yourtelegram
+            YakovVarnaev
           </a>
         </p>
       </div>
@@ -151,6 +150,7 @@ function submitForm() {
 
 .telegram {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 8px;
   margin-top: 12px;

@@ -8,6 +8,7 @@
       <ul class="nav-links">
         <li><a :class="{ dark: isScrolled }" href="#about">Обо мне</a></li>
         <li><a :class="{ dark: isScrolled }" href="#skills">Навыки</a></li>
+        <li><a :class="{ dark: isScrolled }" href="#review">Отзывы</a></li>
         <li><a :class="{ dark: isScrolled }" href="#contact">Контакты</a></li>
       </ul>
     </nav>
