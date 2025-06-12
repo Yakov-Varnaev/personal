@@ -68,7 +68,7 @@ function submitForm() {
   justify-content: center;
   align-items: center;
   padding: 48px 24px;
-  background: linear-gradient(to bottom, #39597a 0%, #2c5364 100%);
+  /* background: linear-gradient(to bottom, #39597a 0%, #2c5364 100%); */
 }
 
 .contact-content {

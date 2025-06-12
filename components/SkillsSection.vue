@@ -156,7 +156,7 @@ onUnmounted(() => cancelAnimationFrame(animationFrame));
 
 .skills-section {
   padding: 64px 0;
-  background: linear-gradient(to bottom, #203a43 0%, #2c5364 100%);
+  /* background: linear-gradient(to bottom, #203a43 0%, #2c5364 100%); */
   transition: background 0.6s ease;
   color: white;
 }

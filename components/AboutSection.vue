@@ -135,7 +135,7 @@ const cardStyle = (index) => {
 .about-me-stack {
   height: calc(100vh * 6);
   position: relative;
-  background: linear-gradient(to bottom, #2c5364 0%, #39597a 100%);
+  /* background: linear-gradient(to bottom, #2c5364 0%, #39597a 100%); */
 }
 
 .stack-wrapper {

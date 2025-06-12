@@ -57,7 +57,7 @@ const reviews = [
 <style scoped>
 .reviews-section {
   padding: 64px 24px;
-  background: linear-gradient(to bottom, #39597a 0%, #2c5364 50%, #39597a 100%);
+  /* background: linear-gradient(to bottom, #39597a 0%, #2c5364 50%, #39597a 100%); */
   text-align: center;
   color: white;
 }

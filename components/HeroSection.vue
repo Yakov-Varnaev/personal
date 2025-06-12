@@ -5,8 +5,8 @@
       <div class="hero-text">
         <h1 class="hero-title">Привет, я Яков Варнаев</h1>
         <p class="hero-typing">
-          <span ref="typedText">{{ typed }}</span
-          ><span class="cursor">|</span>
+          <span ref="typedText">{{ typed }}</span>
+          <span class="cursor">|</span>
         </p>
 
         <v-btn
@@ -87,7 +87,7 @@ const scrollToContact = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to bottom, #0f2027 0%, #203a43 50%);
+  /* background: linear-gradient(to bottom, #0f2027 0%, #203a43 50%); */
   padding: 0 16px;
   color: white;
   text-align: left;
