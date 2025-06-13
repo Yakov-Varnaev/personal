@@ -1,0 +1,24 @@
+
+  background: linear-gradient(to bottom, #39597a 0%, #2c5364 50%, #39597a 100%);
+
+
+const reviews = [
+  {
+    name: "Анна Смирнова",
+    position: "Junior Backend Developer",
+    photo: "https://github.com/alohe/memojis/blob/main/png/7924.png?raw=true",
+    text: "Работа с Яковом помогла мне быстро разобраться в архитектуре микросервисов и начать уверенно разрабатывать сложные backend-системы.",
+  },
+  {
+    name: "Иван Петров",
+    position: "Frontend Engineer",
+    photo: "https://github.com/alohe/memojis/blob/main/png/8603.png?raw=true",
+    text: "Яков — отличный наставник! Его советы по организации кода и практические рекомендации сильно улучшили мои навыки.",
+  },
+  {
+    name: "Мария Кузнецова",
+    position: "DevOps Specialist",
+    photo: "https://github.com/alohe/memojis/blob/main/png/6367.png?raw=true",
+    text: "Благодаря поддержке Якова я успешно внедрила CI/CD процессы и получила уверенность в работе с Kubernetes и Docker.",
+  },
+];

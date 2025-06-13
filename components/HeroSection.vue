@@ -126,7 +126,7 @@ const scrollToContact = () => {
 .cursor {
   display: inline-block;
   width: 1px;
-  background: white;
+  background: transparent;
   animation: blink 1s step-start infinite;
 }
 
