@@ -1,38 +1,42 @@
 <template>
-  <section class="reviews-section" id="review">
-    <h2 class="section-title">Отзывы моих менти</h2>
-    <div class="reviews-container">
-      <v-row
-        class="reviews-row"
-        align="stretch"
-        justify="center"
-        dense
-        :gap="24"
+  <section class="review-section">
+    <div class="review-container">
+      <div
+        v-for="(review, index) in reviews"
+        :key="index"
+        class="review-node"
+        :style="getNodeStyle(index)"
+        :class="{ expanded: expandedIndex === index }"
+        @mousedown="startDrag(index, $event)"
+        @click="handleClick(index)"
       >
-        <v-col
-          v-for="(review, index) in reviews"
-          :key="index"
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
-        >
-          <div class="review-card stack-style">
-            <v-avatar size="72" class="review-avatar mb-4">
-              <v-img :src="review.photo" alt="Фото менти" />
-            </v-avatar>
-            <div class="review-name">{{ review.name }}</div>
-            <div class="review-position">{{ review.position }}</div>
-            <div class="review-text">{{ review.text }}</div>
-          </div>
-        </v-col>
-      </v-row>
+        <img :src="review.photo" class="avatar" />
+        <div class="review-info">
+          <h3>{{ review.name }}</h3>
+          <p class="position">{{ review.position }}</p>
+          <p class="text" :class="{ truncate: expandedIndex !== index }">
+            {{ review.text }}
+          </p>
+          <button class="expand-btn" @click.stop="toggleExpand(index)">
+            {{ expandedIndex === index ? "Свернуть" : "Развернуть" }}
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 </template>
 
 <script setup>
-const reviews = [
+import { ref, onMounted } from "vue";
+
+const focusedIndex = ref(null);
+
+const handleClick = (index) => {
+  if (expandedIndex.value === index) return; // не мешаем раскрытой карточке
+  focusedIndex.value = index;
+};
+
+const reviews = ref([
   {
     name: "Анна Смирнова",
     position: "Junior Backend Developer",
@@ -51,77 +55,173 @@ const reviews = [
     photo: "https://github.com/alohe/memojis/blob/main/png/6367.png?raw=true",
     text: "Благодаря поддержке Якова я успешно внедрила CI/CD процессы и получила уверенность в работе с Kubernetes и Docker.",
   },
-];
+]);
+
+// Дополняем до 10
+while (reviews.value.length < 10) {
+  reviews.value.push({
+    ...reviews.value[reviews.value.length % 3],
+    text:
+      reviews.value[reviews.value.length % 3].text +
+      " Дополнительный текст для теста длинных отзывов.",
+  });
+}
+
+const nodePositions = ref([]);
+const draggingIndex = ref(null);
+const expandedIndex = ref(null);
+
+const startDrag = (index, event) => {
+  // Блокируем перетаскивание развернутой карточки
+  if (expandedIndex.value === index) return;
+
+  draggingIndex.value = index;
+  const startX = event.clientX;
+  const startY = event.clientY;
+  const node = nodePositions.value[index];
+
+  const onMouseMove = (e) => {
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    nodePositions.value[index] = {
+      top: `${parseInt(node.top) + dy}px`,
+      left: `${parseInt(node.left) + dx}px`,
+    };
+  };
+
+  const onMouseUp = () => {
+    draggingIndex.value = null;
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+  };
+
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
+};
+
+const toggleExpand = (index) => {
+  expandedIndex.value = expandedIndex.value === index ? null : index;
+};
+
+onMounted(() => {
+  nodePositions.value = reviews.value.map(() => ({
+    top: `${Math.random() * 500 + 50}px`,
+    left: `${Math.random() * 500 + 50}px`,
+  }));
+});
+
+const getNodeStyle = (index) => {
+  if (expandedIndex.value === index) {
+    return {
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%) scale(1.05)",
+      zIndex: 999,
+    };
+  }
+
+  if (focusedIndex.value === index) {
+    return {
+      top: nodePositions.value[index]?.top,
+      left: nodePositions.value[index]?.left,
+      zIndex: 998,
+    };
+  }
+
+  return {
+    top: nodePositions.value[index]?.top,
+    left: nodePositions.value[index]?.left,
+    zIndex: 10 + index,
+  };
+};
 </script>
 
 <style scoped>
-.reviews-section {
-  padding: 64px 24px;
-  /* background: linear-gradient(to bottom, #39597a 0%, #2c5364 50%, #39597a 100%); */
-  text-align: center;
+.review-section {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #1f2937, #2c3e50);
+  position: relative;
+  overflow: hidden;
+}
+
+.review-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.review-node {
+  position: absolute;
+  width: 260px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
   color: white;
+  cursor: grab;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s ease;
+  max-height: 320px;
+  overflow: hidden;
+
+  transition-property: transform;
+  transition-duration: 0.4s;
+  transition-timing-function: ease;
 }
 
-.section-title {
-  font-weight: 700;
-  font-size: 2.4rem;
-  margin-bottom: 48px;
-  color: #cce4f7;
+.review-node.expanded {
+  width: 400px;
+  max-height: 500px;
+  cursor: default;
+  overflow: auto;
 }
 
-.reviews-container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.review-card {
-  background: linear-gradient(
-    to bottom right,
-    rgba(255, 255, 255, 0.15),
-    rgba(255, 255, 255, 0.1)
-  );
-  backdrop-filter: blur(8px);
-  border-radius: 20px;
-  padding: 24px 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.3s ease;
-  min-height: 320px;
-  text-align: center;
-  user-select: none;
-  color: #e0e8f7;
-}
-
-.review-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-}
-
-.review-avatar {
-  border: 3px solid #cce4f7;
-  box-sizing: content-box;
+.avatar {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
 }
 
-.review-name {
-  font-weight: 700;
-  font-size: 1.3rem;
-  margin-bottom: 6px;
-  color: #cce4f7;
-}
-
-.review-position {
+.review-info h3 {
+  margin: 0;
   font-size: 1rem;
-  font-style: italic;
-  color: #a3bdd9;
-  margin-bottom: 18px;
+  font-weight: bold;
 }
 
-.review-text {
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #d0d9e7;
+.review-info .position {
+  font-size: 0.9rem;
+  color: #a0aec0;
+  margin-bottom: 8px;
+}
+
+.review-info .text {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  max-height: 5.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: max-height 0.3s ease;
+}
+
+.review-node.expanded .text {
+  max-height: none;
+}
+
+.expand-btn {
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  padding: 6px 12px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.2s ease;
+}
+
+.expand-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
 }
 </style>
