@@ -1,10 +1,13 @@
 <template>
   <header :class="['app-header', { scrolled: isScrolled }]">
     <nav class="nav-container">
-      <NuxtLink to="/" :class="['logo', { dark: isScrolled }]">
+      <div
+        :class="['logo', { dark: isScrolled }]"
+        @click="() => scrollTo('hero')"
+      >
         <span class="first-name">Яков</span>
         <span class="last-name">Варнаев</span>
-      </NuxtLink>
+      </div>
 
       <!-- Desktop nav -->
       <ul class="nav-links">
@@ -49,6 +52,13 @@ const closeMenu = () => {
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 40;
+};
+
+const scrollTo = (id) => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth" });
+  }
 };
 
 onMounted(() => {
@@ -99,6 +109,7 @@ onUnmounted(() => {
   align-items: center;
   text-decoration: none;
   color: white;
+  cursor: pointer;
 }
 
 .logo.dark {
