@@ -1,6 +1,6 @@
 <template>
   <section class="review-section">
-    <h2>Отзывы моих менти</h2>
+    <h2 class="title">Отзывы моих менти</h2>
     <div class="review-container" ref="containerRef">
       <div
         v-for="(review, index) in reviews"
@@ -254,9 +254,18 @@ const getNodeStyle = (index) => {
 
 <style scoped>
 .review-section {
-  min-height: 100vh;
+  padding: 80px 0;
+  min-height: 90vh;
   position: relative;
   overflow: hidden;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 48px;
+  color: white;
 }
 
 .review-container {

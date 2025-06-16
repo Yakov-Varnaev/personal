@@ -67,81 +67,93 @@ function submitForm() {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 48px 24px;
-  /* background: linear-gradient(to bottom, #39597a 0%, #2c5364 100%); */
+  padding: 80px 24px;
+  backdrop-filter: blur(20px);
+  color: white;
 }
 
 .contact-content {
-  max-width: 480px;
+  max-width: 520px;
   width: 100%;
-  background: rgba(255 255 255 / 0.85);
-  backdrop-filter: blur(6px);
-  border-radius: 16px;
-  padding: 32px 32px 40px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  padding: 40px 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   text-align: center;
+  transition: all 0.4s ease;
 }
 
 .section-title {
   font-weight: 700;
   font-size: 2rem;
   margin-bottom: 32px;
-  color: #222;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .contact-form label {
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   font-weight: 600;
-  color: #333;
+  color: rgba(255, 255, 255, 0.85);
   text-align: left;
+  font-size: 1rem;
 }
 
 .contact-form input,
 .contact-form textarea {
   width: 100%;
   padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
+  border-radius: 14px;
+  border: none;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
-  resize: vertical;
-  margin-top: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .contact-form input:focus,
 .contact-form textarea:focus {
   outline: none;
-  border-color: #4f46e5;
+  border: 1px solid #8b5cf6;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .contact-form button {
   margin-top: 28px;
   width: 100%;
   padding: 14px 0;
-  background-color: #4f46e5;
+  background: linear-gradient(to right, #6366f1, #8b5cf6);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .contact-form button:hover {
-  background-color: #4338ca;
+  background: linear-gradient(to right, #7c3aed, #6d28d9);
 }
 
 .contacts-info {
-  margin-top: 28px;
+  margin-top: 36px;
   font-size: 1rem;
-  color: #444;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .contacts-info a {
-  color: #4f46e5;
+  color: #a78bfa;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .contacts-info a:hover {
@@ -152,77 +164,47 @@ function submitForm() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 10px;
+  margin-top: 16px;
 }
 
 .telegram a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #4f46e5;
-  text-decoration: none;
   font-weight: 500;
-}
-
-.telegram a:hover {
-  text-decoration: underline;
 }
 
 .telegram-icon {
   width: 20px;
   height: 20px;
-  display: inline-block;
 }
 
-.telegram-link {
-  display: inline-flex;
-  align-items: center;
-  color: #4f46e5;
-  text-decoration: none;
-}
-
-.telegram-link:hover {
-  text-decoration: underline;
-}
-
-/* Dark theme support */
+/* Dark mode override */
 :deep(.v-theme--dark) .contact-content {
-  background: rgba(30 30 30 / 0.85);
-  color: #eee;
+  background: rgba(30, 30, 30, 0.85);
+  color: rgba(255, 255, 255, 0.95);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-}
-
-:deep(.v-theme--dark) .contact-form label {
-  color: #ddd;
 }
 
 :deep(.v-theme--dark) .contact-form input,
 :deep(.v-theme--dark) .contact-form textarea {
-  background: #222;
-  border: 1px solid #444;
+  background: rgba(255, 255, 255, 0.06);
   color: #eee;
 }
 
 :deep(.v-theme--dark) .contact-form input:focus,
 :deep(.v-theme--dark) .contact-form textarea:focus {
   border-color: #a78bfa;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 :deep(.v-theme--dark) .contact-form button {
-  background-color: #a78bfa;
+  background: linear-gradient(to right, #8b5cf6, #a78bfa);
   color: #222;
 }
 
 :deep(.v-theme--dark) .contact-form button:hover {
-  background-color: #7c3aed;
-}
-
-:deep(.v-theme--dark) .contacts-info {
-  color: #ccc;
-}
-
-:deep(.v-theme--dark) .contacts-info a {
-  color: #a78bfa;
+  background: linear-gradient(to right, #7c3aed, #6d28d9);
 }
 </style>

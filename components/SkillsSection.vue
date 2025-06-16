@@ -1,5 +1,9 @@
 <template>
-  <section class="skills-section" id="skills">
+  <section class="skills-section">
+    <div class="title-block">
+      <h2 class="title">Skills</h2>
+      <p class="subtitle">Технологии с которыми я могу помочь</p>
+    </div>
     <div
       class="auto-slider"
       @mouseenter="pauseScroll"
@@ -7,21 +11,16 @@
     >
       <div class="slider-track" ref="track">
         <div
-          class="slide"
           v-for="(skill, index) in duplicatedSkills"
           :key="index"
+          class="slide"
         >
-          <v-card
-            class="skill-card d-flex flex-column align-center justify-center"
-            elevation="6"
-            width="180"
-            height="140"
-          >
-            <v-icon size="40" class="mb-2">{{ skill.icon }}</v-icon>
-            <div class="text-subtitle-2 font-weight-medium">
-              {{ skill.name }}
-            </div>
-          </v-card>
+          <div class="skill-card">
+            <v-icon size="36" class="icon" :style="{ color: skill.color }">
+              {{ skill.icon }}
+            </v-icon>
+            <div class="skill-name">{{ skill.name }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -32,42 +31,30 @@
 import { ref, onMounted, onUnmounted } from "vue";
 
 const skills = [
-  { name: "Python", icon: "mdi-language-python" },
-  { name: "Golang", icon: "mdi-language-go" },
-  { name: "FastAPI", icon: "mdi-lightning-bolt-outline" },
-  { name: "PostgreSQL", icon: "mdi-database" },
-  { name: "Kafka", icon: "mdi-transmission-tower" },
-  { name: "Docker", icon: "mdi-docker" },
-  { name: "Kubernetes", icon: "mdi-kubernetes" },
-  { name: "Redis", icon: "mdi-database-outline" },
+  { name: "Python", icon: "mdi-language-python", color: "#FFD343" },
+  { name: "Golang", icon: "mdi-language-go", color: "#00ADD8" },
+  { name: "FastAPI", icon: "mdi-lightning-bolt-outline", color: "#20C997" },
+  { name: "PostgreSQL", icon: "mdi-database", color: "#336791" },
+  { name: "Kafka", icon: "mdi-transmission-tower", color: "#000000" },
+  { name: "Docker", icon: "mdi-docker", color: "#2496ED" },
+  { name: "Kubernetes", icon: "mdi-kubernetes", color: "#326CE5" },
+  { name: "Redis", icon: "mdi-database-outline", color: "#DC382D" },
 ];
 
-// Дублируем 1 раз, чтобы был запас для плавного перехода
 const duplicatedSkills = [...skills, ...skills];
 
 const track = ref(null);
 let animationFrame;
 let isPaused = false;
-let scrollSpeed = 0.7;
-
-const isScrolling = ref(false);
 
 const scroll = () => {
-  if (!track.value || isPaused) {
-    isScrolling.value = false;
-    return;
-  }
+  if (!track.value || isPaused) return;
 
-  isScrolling.value = true;
-  track.value.scrollLeft += scrollSpeed;
+  track.value.scrollLeft += 0.7;
 
-  const scrollWidth = track.value.scrollWidth / 2;
-  if (track.value.scrollLeft >= scrollWidth) {
-    track.value.style.scrollBehavior = "auto";
-    track.value.scrollLeft -= scrollWidth;
-    requestAnimationFrame(() => {
-      if (track.value) track.value.style.scrollBehavior = "smooth";
-    });
+  const halfScroll = track.value.scrollWidth / 2;
+  if (track.value.scrollLeft >= halfScroll) {
+    track.value.scrollLeft -= halfScroll;
   }
 
   animationFrame = requestAnimationFrame(scroll);
@@ -78,35 +65,55 @@ const pauseScroll = () => {
 };
 
 const resumeScroll = () => {
+  if (!isPaused) return;
   isPaused = false;
-  if (!isScrolling.value) {
-    scroll();
-  }
+  animationFrame = requestAnimationFrame(scroll);
 };
 
 onMounted(() => {
-  if (track.value) {
-    track.value.scrollLeft = 0;
-    track.value.style.scrollBehavior = "smooth";
-    animationFrame = requestAnimationFrame(scroll);
-  }
+  animationFrame = requestAnimationFrame(scroll);
 });
 
-onUnmounted(() => cancelAnimationFrame(animationFrame));
+onUnmounted(() => {
+  cancelAnimationFrame(animationFrame);
+});
 </script>
 
 <style scoped>
+.skills-section {
+  padding: 80px 0;
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  position: relative;
+  color: white;
+}
+
+.title-block {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
 .auto-slider {
   overflow: hidden;
   width: 100%;
-  padding: 32px 0;
+  padding: 16px 0;
 }
 
 .slider-track {
   display: flex;
   flex-wrap: nowrap;
   gap: 16px;
-  padding: 24px 64px;
+  padding: 32px 64px;
   overflow-x: scroll;
   scrollbar-width: none;
   scroll-behavior: smooth;
@@ -121,54 +128,42 @@ onUnmounted(() => cancelAnimationFrame(animationFrame));
 }
 
 .skill-card {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.85),
-    rgba(240, 240, 240, 0.7)
-  );
-  backdrop-filter: blur(8px);
+  width: 180px;
+  height: 140px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
   border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-  color: #333;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .skill-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
 
-/* Dark theme */
+.icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.skill-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Dark mode override */
 :deep(.v-theme--dark) .skill-card {
-  background: linear-gradient(
-    135deg,
-    rgba(30, 30, 30, 0.9),
-    rgba(50, 50, 50, 0.65)
-  );
-  color: #eee;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-}
-:deep(.v-theme--dark) .skill-card:hover {
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
-}
-
-.skills-section {
-  padding: 64px 0;
-  /* background: linear-gradient(to bottom, #203a43 0%, #2c5364 100%); */
-  transition: background 0.6s ease;
-  color: white;
-}
-
-:deep(.v-theme--light) .skills-section {
-  background: linear-gradient(to bottom, #c3cfe2, #f5f7fa);
-  color: #222;
-}
-
-.auto-slider {
-  overflow: hidden;
-  width: 100%;
-  padding: 32px 0;
+  background: rgba(30, 30, 30, 0.85);
+  backdrop-filter: blur(20px);
+  color: rgba(255, 255, 255, 0.9);
 }
 </style>
