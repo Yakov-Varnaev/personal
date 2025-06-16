@@ -1,6 +1,6 @@
 <template>
   <section class="review-section">
-    <div class="review-container">
+    <div class="review-container" ref="containerRef">
       <div
         v-for="(review, index) in reviews"
         :key="index"
@@ -29,13 +29,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 
-const focusedIndex = ref(null);
-
-const handleClick = (index) => {
-  if (expandedIndex.value === index) return; // не мешаем раскрытой карточке
-  focusedIndex.value = index;
-};
-
 const reviews = ref([
   {
     name: "Анна Смирнова",
@@ -58,7 +51,7 @@ const reviews = ref([
 ]);
 
 // Дополняем до 10
-while (reviews.value.length < 10) {
+while (reviews.value.length < 5) {
   reviews.value.push({
     ...reviews.value[reviews.value.length % 3],
     text:
@@ -67,47 +60,163 @@ while (reviews.value.length < 10) {
   });
 }
 
+const containerRef = ref(null);
 const nodePositions = ref([]);
+const nodeVelocities = ref([]);
 const draggingIndex = ref(null);
+const dragOffset = ref({ x: 0, y: 0 });
 const expandedIndex = ref(null);
+const focusedIndex = ref(null);
 
-const startDrag = (index, event) => {
-  // Блокируем перетаскивание развернутой карточки
-  if (expandedIndex.value === index) return;
+const reviewNodeWidth = 260;
+const reviewNodeHeight = 320;
+const expandedWidth = 400;
+const expandedHeight = 500;
 
-  draggingIndex.value = index;
-  const startX = event.clientX;
-  const startY = event.clientY;
-  const node = nodePositions.value[index];
-
-  const onMouseMove = (e) => {
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    nodePositions.value[index] = {
-      top: `${parseInt(node.top) + dy}px`,
-      left: `${parseInt(node.left) + dx}px`,
-    };
-  };
-
-  const onMouseUp = () => {
-    draggingIndex.value = null;
-    document.removeEventListener("mousemove", onMouseMove);
-    document.removeEventListener("mouseup", onMouseUp);
-  };
-
-  document.addEventListener("mousemove", onMouseMove);
-  document.addEventListener("mouseup", onMouseUp);
+const handleClick = (index) => {
+  if (expandedIndex.value === index) return; // не мешаем раскрытой карточке
+  focusedIndex.value = index;
 };
 
 const toggleExpand = (index) => {
   expandedIndex.value = expandedIndex.value === index ? null : index;
 };
 
+// Проверка коллизий
+function checkCollisions() {
+  for (let i = 0; i < nodePositions.value.length; i++) {
+    for (let j = i + 1; j < nodePositions.value.length; j++) {
+      const a = nodePositions.value[i];
+      const b = nodePositions.value[j];
+
+      const dx = parseFloat(b.left) - parseFloat(a.left);
+      const dy = parseFloat(b.top) - parseFloat(a.top);
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      const radiusA = reviewNodeWidth / 2;
+      const radiusB = reviewNodeWidth / 2;
+      const minDist = radiusA + radiusB;
+
+      if (dist < minDist) {
+        // Простое разделение объектов
+        const overlap = (minDist - dist) / 2;
+        const nx = dx / dist;
+        const ny = dy / dist;
+
+        nodePositions.value[i].left = `${parseFloat(a.left) - nx * overlap}px`;
+        nodePositions.value[i].top = `${parseFloat(a.top) - ny * overlap}px`;
+        nodePositions.value[j].left = `${parseFloat(b.left) + nx * overlap}px`;
+        nodePositions.value[j].top = `${parseFloat(b.top) + ny * overlap}px`;
+
+        // Можно добавить "отскок" — изменить скорость
+        nodeVelocities.value[i].x = -nodeVelocities.value[i].x;
+        nodeVelocities.value[i].y = -nodeVelocities.value[i].y;
+        nodeVelocities.value[j].x = -nodeVelocities.value[j].x;
+        nodeVelocities.value[j].y = -nodeVelocities.value[j].y;
+      }
+    }
+  }
+}
+
+const startDrag = (index, event) => {
+  if (expandedIndex.value === index) return;
+
+  draggingIndex.value = index;
+
+  const nodeRect = event.currentTarget.getBoundingClientRect();
+
+  dragOffset.value.x = event.clientX - nodeRect.left;
+  dragOffset.value.y = event.clientY - nodeRect.top;
+};
+
+const onMouseMove = (event) => {
+  if (draggingIndex.value === null) return;
+
+  const containerRect = containerRef.value.getBoundingClientRect();
+
+  let newLeft = event.clientX - containerRect.left - dragOffset.value.x;
+  let newTop = event.clientY - containerRect.top - dragOffset.value.y;
+
+  // Ограничиваем по контейнеру с учётом размеров карточки
+  const nodeW =
+    expandedIndex.value === draggingIndex.value
+      ? expandedWidth
+      : reviewNodeWidth;
+  const nodeH =
+    expandedIndex.value === draggingIndex.value
+      ? expandedHeight
+      : reviewNodeHeight;
+
+  newLeft = Math.min(Math.max(0, newLeft), containerRect.width - nodeW);
+  newTop = Math.min(Math.max(0, newTop), containerRect.height - nodeH);
+
+  nodePositions.value[draggingIndex.value] = {
+    left: `${newLeft}px`,
+    top: `${newTop}px`,
+  };
+};
+
+const onMouseUp = () => {
+  draggingIndex.value = null;
+};
+
 onMounted(() => {
+  const containerRect = containerRef.value.getBoundingClientRect();
+
   nodePositions.value = reviews.value.map(() => ({
-    top: `${Math.random() * 500 + 50}px`,
-    left: `${Math.random() * 500 + 50}px`,
+    top: `${Math.random() * (containerRect.height - reviewNodeHeight)}px`,
+    left: `${Math.random() * (containerRect.width - reviewNodeWidth)}px`,
   }));
+
+  nodeVelocities.value = reviews.value.map(() => ({
+    x: (Math.random() - 0.5) * 1.5,
+    y: (Math.random() - 0.5) * 1.5,
+  }));
+
+  window.addEventListener("mousemove", onMouseMove);
+  window.addEventListener("mouseup", onMouseUp);
+
+  const animate = () => {
+    const containerRect = containerRef.value.getBoundingClientRect();
+
+    for (let i = 0; i < nodePositions.value.length; i++) {
+      if (expandedIndex.value === i || draggingIndex.value == i) continue; // Не двигаем раскрытую
+
+      let left =
+        parseFloat(nodePositions.value[i].left) + nodeVelocities.value[i].x;
+      let top =
+        parseFloat(nodePositions.value[i].top) + nodeVelocities.value[i].y;
+
+      // Проверка границ контейнера
+      const nodeW = reviewNodeWidth;
+      const nodeH = reviewNodeHeight;
+
+      if (left < 0) {
+        left = 0;
+        nodeVelocities.value[i].x = -nodeVelocities.value[i].x;
+      } else if (left > containerRect.width - nodeW) {
+        left = containerRect.width - nodeW;
+        nodeVelocities.value[i].x = -nodeVelocities.value[i].x;
+      }
+
+      if (top < 0) {
+        top = 0;
+        nodeVelocities.value[i].y = -nodeVelocities.value[i].y;
+      } else if (top > containerRect.height - nodeH) {
+        top = containerRect.height - nodeH;
+        nodeVelocities.value[i].y = -nodeVelocities.value[i].y;
+      }
+
+      nodePositions.value[i].left = `${left}px`;
+      nodePositions.value[i].top = `${top}px`;
+    }
+
+    checkCollisions();
+
+    requestAnimationFrame(animate);
+  };
+
+  animate();
 });
 
 const getNodeStyle = (index) => {
@@ -116,6 +225,8 @@ const getNodeStyle = (index) => {
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%) scale(1.05)",
+      width: `${expandedWidth}px`,
+      maxHeight: `${expandedHeight}px`,
       zIndex: 999,
     };
   }
@@ -124,6 +235,8 @@ const getNodeStyle = (index) => {
     return {
       top: nodePositions.value[index]?.top,
       left: nodePositions.value[index]?.left,
+      width: `${reviewNodeWidth}px`,
+      maxHeight: `${reviewNodeHeight}px`,
       zIndex: 998,
     };
   }
@@ -131,6 +244,8 @@ const getNodeStyle = (index) => {
   return {
     top: nodePositions.value[index]?.top,
     left: nodePositions.value[index]?.left,
+    width: `${reviewNodeWidth}px`,
+    maxHeight: `${reviewNodeHeight}px`,
     zIndex: 10 + index,
   };
 };
@@ -139,7 +254,6 @@ const getNodeStyle = (index) => {
 <style scoped>
 .review-section {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #1f2937, #2c3e50);
   position: relative;
   overflow: hidden;
 }
@@ -148,11 +262,11 @@ const getNodeStyle = (index) => {
   position: relative;
   width: 100%;
   height: 100vh;
+  user-select: none;
 }
 
 .review-node {
   position: absolute;
-  width: 260px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(12px);
@@ -160,20 +274,19 @@ const getNodeStyle = (index) => {
   color: white;
   cursor: grab;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: all 0.4s ease;
-  max-height: 320px;
   overflow: hidden;
 
   transition-property: transform;
   transition-duration: 0.4s;
   transition-timing-function: ease;
+  max-height: 320px;
 }
 
 .review-node.expanded {
-  width: 400px;
-  max-height: 500px;
   cursor: default;
   overflow: auto;
+  max-height: 500px;
+  width: 400px !important; /* override */
 }
 
 .avatar {

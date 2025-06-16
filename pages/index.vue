@@ -5,6 +5,7 @@
     <SkillsSection />
     <!-- <ProjectsSection /> -->
     <ReviewSection id="review" />
+    <MentorBenefits />
     <ContactSection />
   </div>
 </template>
