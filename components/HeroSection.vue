@@ -14,10 +14,23 @@
           elevation="0"
           rounded="lg"
           size="large"
-          @click="scrollToContact"
+          @click="scrollTo('contact')"
         >
           Связаться
         </v-btn>
+
+        <div class="hero-links">
+          <p class="hero-subtitle">На этом сайте:</p>
+          <div class="hero-nav">
+            <button @click="scrollTo('about')">Обо мне</button>
+            <button @click="scrollTo('skills')">Навыки</button>
+            <button @click="scrollTo('review')">Отзывы</button>
+            <button @click="scrollTo('benefits')">
+              Зачем тебе менторство?
+            </button>
+            <button @click="scrollTo('contact')">Контакты</button>
+          </div>
+        </div>
       </div>
 
       <!-- Правая часть: фото -->
@@ -73,8 +86,8 @@ onMounted(() => {
   setTimeout(typeNextChar, 800);
 });
 
-const scrollToContact = () => {
-  const el = document.getElementById("contact");
+const scrollTo = (id) => {
+  const el = document.getElementById(id);
   if (el) {
     el.scrollIntoView({ behavior: "smooth" });
   }
@@ -200,5 +213,38 @@ const scrollToContact = () => {
 :deep(.v-theme--light) .hero-section {
   background: linear-gradient(to bottom right, #f5f7fa, #c3cfe2);
   color: #222;
+}
+
+.hero-links {
+  margin-top: 40px;
+  text-align: left;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  color: #ccc;
+}
+
+.hero-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hero-nav button {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: background 0.3s ease;
+}
+
+.hero-nav button:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 </style>

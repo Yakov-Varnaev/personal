@@ -1,11 +1,11 @@
 <template>
   <div class="landing">
     <HeroSection />
-    <AboutSection />
-    <SkillsSection />
+    <AboutSection id="about" />
+    <SkillsSection id="skills" />
     <!-- <ProjectsSection /> -->
     <ReviewSection id="review" />
-    <MentorBenefits />
+    <MentorBenefits id="benefits" />
     <ContactSection />
   </div>
 </template>
